@@ -1,7 +1,8 @@
 /* eslint-disable */
 <template>
 	<v-container fluid>
-		<v-container v-if="!showBenchmark" grid-list-md fluid text-xs-center>
+		<v-container v-if="showCoinList" grid-list-md fluid text-xs-center>
+			<h1>Coins and Tokens list</h1>
 			<v-layout row wrap>
 				<v-flex xs10>
 					<v-subheader>Search coins</v-subheader>
@@ -13,7 +14,10 @@
 					></v-text-field>
 				</v-flex>
 				<v-flex xs2>
-					<v-btn color="info" @click="findCoins()" type="button">Search</v-btn>
+					<v-btn color="info"
+					       @click="findCoins()"
+					       type="button">Search
+					</v-btn>
 				</v-flex>
 			</v-layout>
 			<v-layout row wrap>
@@ -49,15 +53,22 @@
 				</v-flex>
 			</v-layout>
 		</v-container>
-		<v-container v-if="!showBenchmark" grid-list-md fluid text-xs-center>
+		<v-container v-if="showCoinList" grid-list-md fluid text-xs-center>
+			<v-btn color="info"
+			       @click="resetFilters()"
+			       type="button">Reset
+			</v-btn>
 			<v-slide-y-transition mode="out-in">
-				<v-layout column align-center>
-					<v-btn color="info" @click="filterCoins()" type="button">Filter</v-btn>
-					<v-btn color="info" @click="getCoins()" type="button">Reset</v-btn>
+				<v-layout column>
+					<!--<v-btn color="info"-->
+					       <!--@click="showPortfolioView(true)"-->
+					       <!--type="button">Show Portfolio-->
+					<!--</v-btn>-->
 					<v-data-table
 							:headers="headers"
 							:items="coins"
-							hide-actions
+							:loading="true"
+							:rows-per-page-items="[10,25,50,{'text':'All','value':-1}]"
 							class="elevation-1">
 						<template slot="items" slot-scope="props">
 							<td>#{{ props.item.rank }}</td>
@@ -70,14 +81,27 @@
 							<td class="text-xs-right">{{ props.item.percent_change_7d }} %</td>
 							<td class="text-xs-right">
 								<v-btn color="info" @click="analyseCoin(props.item)" type="button">Analyse</v-btn>
+								<v-btn color="info" v-if="!props.item.selected"  @click="addToPortfolio(props.item)" type="button">Add</v-btn>
+								<v-btn color="error" v-if="props.item.selected" @click="removeFromPortfolio(props.item)" type="button">Remove</v-btn>
 							</td>
 						</template>
 					</v-data-table>
 				</v-layout>
 			</v-slide-y-transition>
+			<v-container v-if="showCoinList" grid-list-md fluid text-xs-center>
+				<v-layout row wrap>
+					<v-flex xs12>
+						<portfolio></portfolio>
+					</v-flex>
+				</v-layout>
+			</v-container>
 		</v-container>
+		<!-- COIN BENCHMARK -->
 		<v-container v-if="showBenchmark" grid-list-md fluid text-xs-center>
-			<v-btn color="info" @click="toggleBenchmark(false);" type="button">Back to coins overview</v-btn>
+			<v-btn color="info"
+			       @click="toggleBenchmark(false);"
+			       type="button">Back to coins overview
+			</v-btn>
 			<h1>{{ benchmark.baseComparisonCoin.name }} current price {{ benchmark.baseComparisonCoin.price_usd }}</h1>
 			<h2>{{ benchmark.baseComparisonCoin.name }} is ranked - #{{ benchmark.baseComparisonCoin.rank }}</h2>
 			<h2>{{ benchmark.baseComparisonCoin.name }} price if it reaches...</h2>
@@ -98,11 +122,8 @@
 	</v-container>
 </template>
 <script>
-	//TODO finish the filters
-	//TODO create a screen for price prejections per portfolio so that I can see diffrente scenarios for my portfolio
-	//TODO create a way to adjust portfolio asset percentages and adjust and see the portfolio per scenario
-	//TODO create tool which will project prices based on an increase in total market cap taking. If the total marketcap increases to a certain amount what will be the prices of the analysed currency
 	import store from '../store'
+	import Portfolio from './Portfolio'
 
 	export default {
 		data () {
@@ -121,26 +142,36 @@
 				headersPriceProjections: [
 					{text: 'Scenario', align: 'left', sortable: false, value: 'scenario'},
 					{text: 'Name', align: 'left', sortable: false, value: 'name'},
-					{text: 'Price (usd) of... ', sortable: false, value: 'priceUsd'},
-
+					{text: 'Price (usd) of... ', sortable: false, value: 'priceUsd'}
+				],
+				headersPortfolio: [
+					{text: 'Coin', align: 'left', sortable: false, value: 'scenario'},
+					{text: 'Percentage Invested', align: 'left', sortable: false, value: 'percentage'},
+					{text: 'Total Amount', sortable: false, value: 'percentage'}
 				],
 				filtersData: {
 					marktCapRange: [
 						{text: 'Select a value', value: null},
-						{text: 'less than 100000000', value: 100000000},
-						{text: 'less than 300000000', value: 300000000},
-						{text: 'less than 500000000', value: 500000000}
+						{text: 'less than 10000000', value: 10000000},
+						{text: 'less than 30000000', value: 30000000},
+						{text: 'less than 50000000', value: 50000000}
 					],
 					priceRange: [
 						{text: 'Select a value', value: null},
 						{text: 'less than 1', value: 1},
 						{text: 'less than 5', value: 5},
-						{text: 'less than 10', value: 10}],
+						{text: 'less than 10', value: 10},
+						{text: 'less than 50', value: 50},
+						{text: 'less than 100', value: 100},
+						{text: 'less than 300', value: 300},
+						{text: 'less than 500', value: 500},
+						{text: 'less than 1000', value: 1000},
+					],
 					supplyRange: [
 						{text: 'Select a value', value: null},
-						{text: 'less than 100000000', value: 100000000},
-						{text: 'less than 300000000', value: 300000000},
-						{text: 'less than 500000000', value: 500000000}
+						{text: 'less than 10000000', value: 10000000},
+						{text: 'less than 30000000', value: 30000000},
+						{text: 'less than 50000000', value: 50000000}
 					]
 				},
 				filterCriteria: {
@@ -160,14 +191,30 @@
 						{text: 'Top 30 marketcap', price: null, coinName: null}
 					]
 				},
-				searchQuery: ''
-
+				searchQuery: '',
+				totalInvestment: 100
 			}
 		},
 		mounted() {
 			this.getCoins();
 		},
 		methods: {
+			showPortfolioView(){
+				store.dispatch('togglePortfolio', true);
+			},
+			addToPortfolio(item){
+				store.dispatch('addToPortfolio', item);
+
+			},
+			removeFromPortfolio(item){
+				store.dispatch('removeFromPortfolio', item)
+			},
+			resetFilters(){
+				_.forEach(this.filterCriteria, (val, key) => {
+					this.filterCriteria[key] = null;
+				});
+				store.dispatch('getCoins');
+			},
 			getCoins(){
 				store.dispatch('getCoins');
 			},
@@ -209,19 +256,34 @@
 			},
 			toggleBenchmark(bool){
 				store.dispatch('toggleBenchmark', bool);
+			},
+			toggleCoinList(bool){
+				store.dispatch('toggleCoinList', bool);
 			}
 		},
 		computed: {
 			coins(){
-				return this.$store.getters.coins;
+				return this.$store.getters.coins(this.filterCriteria);
 			},
 			initialCoinsState(){
 				return this.$store.getters.initialCoinsState;
 			},
 			showBenchmark(){
 				return this.$store.state.isBenchmarkVisible;
+			},
+			showPortfolio(){
+				return this.$store.state.isPortfolioVisible;
+			},
+			showCoinList(){
+				return this.$store.state.isCoinListVisible;
+			},
+			portfolio(){
+				return this.$store.getters.portfolio;
 			}
 		},
-		watch: {}
+		watch: {},
+		components:{
+			Portfolio:Portfolio
+		}
 	}
 </script>
