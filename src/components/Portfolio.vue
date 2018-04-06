@@ -3,10 +3,6 @@
 	<v-container fluid>
 		<!-- PORTFOLIO -->
 		<v-container grid-list-md fluid text-xs-center>
-			<!--<v-btn color="info"-->
-			       <!--@click="toggleBenchmark(false);"-->
-			       <!--type="button">Back to coins overview-->
-			<!--</v-btn>-->
 			<h1>Portofolio</h1>
 			<v-slide-y-transition mode="out-in">
 				<v-layout column align-center>
@@ -32,9 +28,7 @@
 	</v-container>
 </template>
 <script>
-
 	import store from '../store'
-
 	export default {
 		data () {
 			return {

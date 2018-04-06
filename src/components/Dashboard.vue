@@ -61,8 +61,8 @@
 			<v-slide-y-transition mode="out-in">
 				<v-layout column>
 					<!--<v-btn color="info"-->
-					       <!--@click="showPortfolioView(true)"-->
-					       <!--type="button">Show Portfolio-->
+					<!--@click="showPortfolioView(true)"-->
+					<!--type="button">Show Portfolio-->
 					<!--</v-btn>-->
 					<v-data-table
 							:headers="headers"
@@ -80,9 +80,20 @@
 							<td class="text-xs-right">{{ props.item.percent_change_24h }} %</td>
 							<td class="text-xs-right">{{ props.item.percent_change_7d }} %</td>
 							<td class="text-xs-right">
-								<v-btn color="info" @click="analyseCoin(props.item)" type="button">Analyse</v-btn>
-								<v-btn color="info" v-if="!props.item.selected"  @click="addToPortfolio(props.item)" type="button">Add</v-btn>
-								<v-btn color="error" v-if="props.item.selected" @click="removeFromPortfolio(props.item)" type="button">Remove</v-btn>
+								<v-btn color="info"
+								       @click="analyseCoin(props.item)"
+								       type="button">Analyse
+								</v-btn>
+								<v-btn color="info"
+								       v-if="!props.item.selected"
+								       @click="addToPortfolio(props.item)"
+								       type="button">Add
+								</v-btn>
+								<v-btn color="error"
+								       v-if="props.item.selected"
+								       @click="removeFromPortfolio(props.item)"
+								       type="button">Remove
+								</v-btn>
 							</td>
 						</template>
 					</v-data-table>
@@ -282,8 +293,8 @@
 			}
 		},
 		watch: {},
-		components:{
-			Portfolio:Portfolio
+		components: {
+			Portfolio: Portfolio
 		}
 	}
 </script>
