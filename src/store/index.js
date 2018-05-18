@@ -3,6 +3,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import Axios from 'axios';
 import _ from 'lodash';
+import coinData from '../nodeCoinDataGetter/coinData.json';
 
 Vue.use(Vuex);
 
@@ -117,6 +118,7 @@ const store = new Vuex.Store({
 			}).catch((responseError) => {
 				console.log(responseError);
 			});
+			commit('getCoins', coinData);
 		},
 		login({commit}){
 			Axios.post('https://auth').then(response => {

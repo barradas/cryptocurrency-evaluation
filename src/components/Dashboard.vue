@@ -68,7 +68,7 @@
 							:headers="headers"
 							:items="coins"
 							:loading="true"
-							:rows-per-page-items="[10,25,50,{'text':'All','value':-1}]"
+							:rows-per-page-items="[25,50,75,100,{'text':'All','value':-1}]"
 							class="elevation-1">
 						<template slot="items" slot-scope="props">
 							<td>#{{ props.item.rank }}</td>
@@ -126,6 +126,8 @@
 						<td>{{ props.item.text }}</td>
 						<td>{{ props.item.name }}</td>
 						<td class="text-xs-right">${{ props.item.price }}</td>
+						<td class="text-xs-right">${{ props.item.price30 }}</td>
+						<td class="text-xs-right">${{ props.item.price50 }}</td>
 					</template>
 				</v-data-table>
 			</v-layout>
@@ -153,7 +155,9 @@
 				headersPriceProjections: [
 					{text: 'Scenario', align: 'left', sortable: false, value: 'scenario'},
 					{text: 'Name', align: 'left', sortable: false, value: 'name'},
-					{text: 'Price (usd) of... ', sortable: false, value: 'priceUsd'}
+					{text: 'Price (usd)', sortable: false, value: 'priceUsd'},
+					{text: 'Price (usd) if 30% increase in mrktCap', sortable: false, value: 'priceUsd30'},
+					{text: 'Price (usd) if 50% increase in mrktCap', sortable: false, value: 'priceUsd50'}
 				],
 				headersPortfolio: [
 					{text: 'Coin', align: 'left', sortable: false, value: 'scenario'},
@@ -193,13 +197,13 @@
 				benchmark: {
 					baseComparisonCoin: null,
 					priceProjections: [
-						{text: 'Top 1 marketcap', price: null, coinName: null},
-						{text: 'Top 2 marketcap', price: null, coinName: null},
-						{text: 'Top 3 marketcap', price: null, coinName: null},
-						{text: 'Top 5 marketcap', price: null, coinName: null},
-						{text: 'Top 10 marketcap', price: null, coinName: null},
-						{text: 'Top 20 marketcap', price: null, coinName: null},
-						{text: 'Top 30 marketcap', price: null, coinName: null}
+						{text: 'Top 1 marketcap', price: null, price30: null, price50: null, coinName: null},
+						{text: 'Top 2 marketcap', price: null, price30: null, price50: null, coinName: null},
+						{text: 'Top 3 marketcap', price: null, price30: null, price50: null, coinName: null},
+						{text: 'Top 5 marketcap', price: null, price30: null, price50: null, coinName: null},
+						{text: 'Top 10 marketcap', price: null, price30: null, price50: null, coinName: null},
+						{text: 'Top 20 marketcap', price: null, price30: null, price50: null, coinName: null},
+						{text: 'Top 30 marketcap', price: null, price30: null, price50: null, coinName: null}
 					]
 				},
 				searchQuery: '',
@@ -255,6 +259,22 @@
 				this.benchmark.priceProjections[4].price = coin.price_usd * top10MarkCap / coin.market_cap_usd;
 				this.benchmark.priceProjections[5].price = coin.price_usd * top20MarkCap / coin.market_cap_usd;
 				this.benchmark.priceProjections[6].price = coin.price_usd * top30MarkCap / coin.market_cap_usd;
+
+				this.benchmark.priceProjections[0].price30 = coin.price_usd * top1MarkCap * 1.30 / coin.market_cap_usd;
+				this.benchmark.priceProjections[1].price30 = coin.price_usd * top2MarkCap* 1.30 / coin.market_cap_usd;
+				this.benchmark.priceProjections[2].price30 = coin.price_usd * top3MarkCap* 1.30 / coin.market_cap_usd;
+				this.benchmark.priceProjections[3].price30 = coin.price_usd * top5MarkCap* 1.30 / coin.market_cap_usd;
+				this.benchmark.priceProjections[4].price30 = coin.price_usd * top10MarkCap* 1.30 / coin.market_cap_usd;
+				this.benchmark.priceProjections[5].price30 = coin.price_usd * top20MarkCap* 1.30 / coin.market_cap_usd;
+				this.benchmark.priceProjections[6].price30 = coin.price_usd * top30MarkCap* 1.30 / coin.market_cap_usd;
+
+				this.benchmark.priceProjections[0].price50 = coin.price_usd * top1MarkCap * 1.50 / coin.market_cap_usd;
+				this.benchmark.priceProjections[1].price50 = coin.price_usd * top2MarkCap * 1.50 / coin.market_cap_usd;
+				this.benchmark.priceProjections[2].price50 = coin.price_usd * top3MarkCap * 1.50 / coin.market_cap_usd;
+				this.benchmark.priceProjections[3].price50 = coin.price_usd * top5MarkCap * 1.50 / coin.market_cap_usd;
+				this.benchmark.priceProjections[4].price50 = coin.price_usd * top10MarkCap * 1.50 / coin.market_cap_usd;
+				this.benchmark.priceProjections[5].price50 = coin.price_usd * top20MarkCap * 1.50 / coin.market_cap_usd;
+				this.benchmark.priceProjections[6].price50 = coin.price_usd * top30MarkCap * 1.50 / coin.market_cap_usd;
 
 				this.benchmark.priceProjections[0].name = this.initialCoinsState[0].name;
 				this.benchmark.priceProjections[1].name = this.initialCoinsState[1].name;
